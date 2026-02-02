@@ -30,7 +30,7 @@ export const userControllers = new Elysia({ prefix: "/users" })
   try {
     const userId = Number(params.id);
     if (Number.isNaN(userId)) {
-      set.status = 404;
+      set.status = 400;
       return {
         message: "Invalid user id"
       }
