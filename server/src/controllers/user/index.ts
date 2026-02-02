@@ -214,3 +214,37 @@ export const userControllers = new Elysia({ prefix: "/users" })
 }, {
   body: updateUserBody
 })
+
+.delete("/:id", async ({ params, set }) => {
+  try {
+    const userId = Number(params.id);
+    if (Number.isNaN(userId)) {
+      set.status = 400;
+      return {
+        message: "Invalid user id"
+      }
+    }
+
+    const result = await db
+      .delete(user)
+      .where(eq(user.user_id, userId))
+      .returning();
+
+    if (result.length === 0) {
+      set.status = 404;
+      return {
+        message: "User not found"
+      }
+    }
+
+    return {
+      message: "Deleted user successfully!"
+    }
+  } catch (error: any) {
+    console.error(error);
+    set.status = 500;
+    return {
+      message: "Internal server error"
+    }
+  }
+});
