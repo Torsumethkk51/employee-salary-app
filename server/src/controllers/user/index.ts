@@ -9,7 +9,11 @@ export const userControllers = new Elysia({ prefix: "/users" })
 .get("/", async ({ set }) => {
   try {
     const result = await db
-      .select()
+      .select({
+        user_id: user.user_id,
+        username: user.username,
+        email: user.email
+      })
       .from(user)
 
     return result;
