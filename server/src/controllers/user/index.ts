@@ -37,7 +37,11 @@ export const userControllers = new Elysia({ prefix: "/users" })
     }
 
     const result = await db
-      .select()
+      .select({
+        user_id: user.user_id,
+        username: user.username,
+        email: user.email
+      })
       .from(user)
       .where(eq(user.user_id, userId))
 
