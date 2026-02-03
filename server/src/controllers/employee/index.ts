@@ -2,6 +2,7 @@ import Elysia from "elysia";
 import { db } from "../../database/db";
 import { employee } from "../../database/schema";
 import { eq } from "drizzle-orm";
+import { type createBodyValue, createBody } from "../../types/employeeController";
 
 export const employeeController = new Elysia({ prefix: "/employee" })
 
@@ -54,4 +55,59 @@ export const employeeController = new Elysia({ prefix: "/employee" })
       message: "Internal server error"
     }
   }
+})
+
+.post("/", async ({ body, set }) => {
+  try {
+    const firstname = body.firstname.trim();
+    const lastname = body.lastname.trim();
+
+    // validate request body
+    if (!firstname) {
+      set.status = 400;
+      return {
+        message: "Firstname is required"
+      }
+    }
+
+    if (!lastname) {
+      set.status = 400;
+      return {
+        message: "Lastname is required"
+      }
+    }
+
+    // prepare request body
+    const bodyValue: createBodyValue = {
+      firstname: firstname,
+      lastname: lastname
+    }
+
+    // handle optional fields
+    if (body.nickname) {
+      bodyValue.nickname = body.nickname.trim();
+    }
+
+    if (body.job_titles) {
+      bodyValue.job_titles = body.job_titles.trim();
+    }
+
+    // create employee
+    await db
+      .insert(employee)
+      .values(bodyValue);
+
+    set.status = 201;
+    return {
+      message: "Created employee successfully!"
+    }
+  } catch (error) {
+    console.error(error)
+    set.status = 500;
+    return {
+      message: "Internal server error"
+    }
+  }
+}, {
+  body: createBody
 })
