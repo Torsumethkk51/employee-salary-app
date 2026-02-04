@@ -192,3 +192,41 @@ export const employeeController = new Elysia({ prefix: "/employee" })
 }, {
   body: updateBody
 })
+
+.delete("/:id", async ({ params, set }) => {
+  try {
+    // validate employee id
+    const employeeId = Number(params.id);
+    if (!Number.isInteger(employeeId) || employeeId <= 0) {
+      set.status = 400;
+      return {
+        message: "Invalid employee id"
+      }
+    }
+
+    // employee soft delete
+    const deletedEmployee = await db
+      .update(employee)
+      .set({ deleted_at: new Date() })
+      .where(eq(employee.employee_id, employeeId))
+      .returning();
+
+    // handle employee not found
+    if (deletedEmployee.length === 0) {
+      set.status = 404;
+      return {
+        message: "Employee not found"
+      }
+    }
+
+    return {
+      message: "Employee is moved to recybin bin"
+    }
+  } catch (error) {
+    console.error(error)
+    set.status = 500;
+    return {
+      message: "Internal server error"
+    }
+  }
+})
