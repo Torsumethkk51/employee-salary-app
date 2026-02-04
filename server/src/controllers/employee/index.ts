@@ -145,15 +145,15 @@ export const employeeController = new Elysia({ prefix: "/employee" })
       bodyValue.firstname = firstname.trim();
     }
 
-    if (lastname) {
+    if (lastname?.trim()) {
       bodyValue.lastname = lastname.trim();
     }
 
-    if (nickname) {
+    if (nickname?.trim()) {
       bodyValue.nickname = nickname.trim();
     }
 
-    if (jobTitles) {
+    if (jobTitles?.trim()) {
       bodyValue.job_titles = jobTitles.trim();
     }
 
