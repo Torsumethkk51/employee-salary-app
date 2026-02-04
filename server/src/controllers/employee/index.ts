@@ -1,7 +1,7 @@
 import Elysia from "elysia";
 import { db } from "../../database/db";
 import { employee } from "../../database/schema";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { type createBodyValue, createBody, updateBody, updateBodyValue } from "../../types/employeeController";
 
 export const employeeController = new Elysia({ prefix: "/employee" })
@@ -10,7 +10,8 @@ export const employeeController = new Elysia({ prefix: "/employee" })
   try {
     const result = await db
       .select()
-      .from(employee);
+      .from(employee)
+      .where(isNull(employee.deleted_at));
 
     return result;
   } catch (error) {
@@ -37,7 +38,7 @@ export const employeeController = new Elysia({ prefix: "/employee" })
     const [employeeData] = await db
       .select()
       .from(employee)
-      .where(eq(employee.employee_id, employeeId))
+      .where(and(eq(employee.employee_id, employeeId), isNull(employee.deleted_at)))
 
     // check if employee not found
     if (!employeeData) {
@@ -168,7 +169,7 @@ export const employeeController = new Elysia({ prefix: "/employee" })
     const updatedEmployee = await db
       .update(employee)
       .set(bodyValue)
-      .where(eq(employee.employee_id, employeeId))
+      .where(and(eq(employee.employee_id, employeeId), isNull(employee.deleted_at)))
       .returning();
 
     // handle employee not found
